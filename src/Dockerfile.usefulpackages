@@ -44,5 +44,81 @@ RUN pip install --no-cache-dir \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
 
+
+
+# # for GLIP and DETReg
+# RUN pip install \
+#     opencv-contrib-python \
+#     einops \
+#     shapely \
+#     timm \
+#     yacs \
+#     tensorboardX \
+#     ftfy \
+#     prettytable \
+#     pymongo \
+#     transformers \
+#     numpy==1.22 \
+#     # fix permissions of conda
+#  && fix-permissions "${CONDA_DIR}" \
+#  && fix-permissions "/home/${NB_USER}"
+
+# prereq for zen3geo
+RUN conda install geopandas rioxarray --channel conda-forge \
+    && fix-permissions "${CONDA_DIR}" \
+    && fix-permissions "/home/${NB_USER}"
+RUN pip install zen3geo
+
+# prereq for ultralytics (YOLOv8)
+RUN pip install \
+    opencv-contrib-python \
+    matplotlib \
+    Pillow \
+    PyYAML \
+    requests \
+    scipy \
+    tqdm \
+    numpy \
+    # fix permissions of conda
+ && fix-permissions "${CONDA_DIR}" \
+ && fix-permissions "/home/${NB_USER}"
+# and install ultralytics
+RUN pip install ultralytics \
+ && fix-permissions "${CONDA_DIR}" \
+ && fix-permissions "/home/${NB_USER}" 
+
+# for Segment-Anything
+
+# RUN pip install \
+# pycocotools \
+# matplotlib \
+# onnxruntime \
+# onnx \
+# # fix permissions of conda
+#  && fix-permissions "${CONDA_DIR}" \
+#  && fix-permissions "/home/${NB_USER}"
+
+
+# for STABLE DIFFUSION
+RUN pip install \
+diffusers["torch"] \
+transformers \
+accelerate \
+wandb \
+evaluate \
+# fix permissions of conda
+ && fix-permissions "${CONDA_DIR}" \
+ && fix-permissions "/home/${NB_USER}"
+
+RUN conda install xformers -c xformers \
+ && fix-permissions "${CONDA_DIR}" \
+ && fix-permissions "/home/${NB_USER}"
+
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/conda/lib
+# run because magic command to fix all problems ever
+USER root
+RUN ldconfig
+USER $NB_UID
+
